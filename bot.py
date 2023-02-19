@@ -17,7 +17,8 @@ DP = Dispatcher(BOT)
 CHAT_ID = cfg.get_chat_id()
 TRACKING_BUILDS = {}
 
-
+ 
+# Стартовая функция
 @DP.message_handler(commands=['start'])
 async def start(message: types.Message) -> None:
     """
