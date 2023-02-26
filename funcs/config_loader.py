@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# для парсинга CFG файлов
 import configparser
 from pathlib import Path
 

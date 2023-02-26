@@ -3,17 +3,23 @@
 import asyncio
 import logging
 
+# методы IOgram для телеграмм
 from aiogram import Bot, Dispatcher, executor, types
-
+# Кастомные логи для телеграмм
 from Logger import logger
+# конфиги необходимые
 from funcs import config_loader as cfg
+# функции необходимы для работы
 from funcs import main_funcs as mf
 
+# загрузка базового логгинга (можно менять уровень логов info, debag, errors, warnings)
 logging.basicConfig(level=logging.INFO)
 
+# Для работы бота в телеграмм
 TOKEN = cfg.get_token()
 BOT = Bot(TOKEN)
 DP = Dispatcher(BOT)
+# то куда мы будем выводить, информация о билде
 CHAT_ID = cfg.get_chat_id()
 TRACKING_BUILDS = {}
 
@@ -82,7 +88,7 @@ async def message_listener(message: types.Message) -> None:
 
     :param message: любой текст, отправляемый боту
     """
-    pass
+    await message.answer("Введите команду")
 
 
 # Стартовая функция для запуска бота.
