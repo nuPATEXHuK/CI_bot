@@ -90,6 +90,19 @@ async def message_listener(message: types.Message) -> None:
     """
     await message.answer("Введите команду")
 
+@DP.message_handler(commands=['help'])
+async def help(message: types.Message) -> None:
+        """
+        Получение справки по боту
+
+        :param message: входящая команда /help
+        """
+        answer = mf.get_help()
+        if answer:
+            await message.answer(answer)
+        else:
+            await message.answer('Ничего не вернулось')
+
 
 # Стартовая функция для запуска бота.
 if __name__ == "__main__":

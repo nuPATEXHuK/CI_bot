@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import bot
-import funcs.check_funcs as check
 from funcs import config_loader as cfg
 from funcs import jenkins_app as jks
 from Logger import logger
@@ -61,9 +60,5 @@ def test_func() -> str:
 
     :return: тестовые данные
     """
-    status = check.release_already_start('test_release')
-    if status:
-        answer = 'Релиз запущен'
-    else:
-        answer = 'Релиз остановлен'
+    answer = "Тестовая функция"
     return answer
