@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=import-error
-import asyncio
 import logging
+import threading
 
 # методы IOgram для телеграмм
 from aiogram import Bot, Dispatcher, executor, types
+
 # Кастомные логи для телеграмм
 from Logger import logger
 # конфиги необходимые
 from funcs import config_loader as cfg
+from funcs import jenkins_checker_thread
 # функции необходимы для работы
 from funcs import main_funcs as mf
 
-# загрузка базового логгинга (можно менять уровень логов info, debag, errors, warnings)
+# загрузка базового логгинга (можно менять уровень
+# логов info, debag, errors, warnings)
 logging.basicConfig(level=logging.INFO)
 
 # Для работы бота в телеграмм
@@ -23,7 +26,7 @@ DP = Dispatcher(BOT)
 CHAT_ID = cfg.get_chat_id()
 TRACKING_BUILDS = {}
 
- 
+
 # Стартовая функция
 @DP.message_handler(commands=['start'])
 async def start(message: types.Message) -> None:
@@ -71,7 +74,8 @@ def send_build_info(message: str, build_info: str, finish: bool = False):
 @DP.message_handler(commands=['build'])
 async def build_add(message: types.Message) -> None:
     """
-    Запуск нового билда на сборку
+    Запуск нового билда на сборку (возможно расширение
+    функции для указания конкретного билда)
 
     :param message: входящая команда /build
     """
@@ -79,33 +83,28 @@ async def build_add(message: types.Message) -> None:
     await message.answer(answer)
 
 
-# Прослушка сообщений
-@DP.message_handler(content_types=['text'])
-async def message_listener(message: types.Message) -> None:
-    """
-    Постоянная прослушка сообщений. В группах работает только при активной
-    админке бота
-
-    :param message: любой текст, отправляемый боту
-    """
-    await message.answer("Введите команду")
-
 @DP.message_handler(commands=['help'])
-async def help(message: types.Message) -> None:
-        """
-        Получение справки по боту
+async def get_help(message: types.Message) -> None:
+    """
+    Получение справки по боту
 
-        :param message: входящая команда /help
-        """
-        answer = mf.get_help()
-        if answer:
-            await message.answer(answer)
-        else:
-            await message.answer('Ничего не вернулось')
+    :param message: входящая команда /help
+    """
+    answer = mf.get_help()
+    if answer:
+        await message.answer(answer)
+    else:
+        await message.answer('Ничего не вернулось')
 
 
 # Стартовая функция для запуска бота.
 if __name__ == "__main__":
+    # Создание и запуск отдельного треда чекера дженкинса
+    logger.info('Запуск треда дженкинса на проверку билдов')
+    jenkins_main_thread = threading.Thread(name='jenkins_checker_thread',
+                                           target=jenkins_checker_thread,
+                                           daemon=True)
+    jenkins_main_thread.start()
     logger.info('Начало прослушки и готовности ботом принимать '
                 'команды (long polling)')
     executor.start_polling(DP, skip_updates=True)

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import bot
+from Logger import logger
 from funcs import config_loader as cfg
 from funcs import jenkins_app as jks
-from Logger import logger
 
 CHAT_ID = int(cfg.get_chat_id())
 
@@ -16,10 +16,11 @@ def add_build() -> str:
     """
     logger.info('Запущено добавление нового билда')
     errors = jks.new_build()
-    if not errors:
+    # Если не вернулись ошибки:
+    if len(errors) < 1:
         logger.info('Билд запущен')
         return 'Билд запущен'
-    return errors
+    return str(errors)
 
 
 def send_message(message: str, build_info: str):
