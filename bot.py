@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=import-error
 import logging
-import threading
 
 # методы IOgram для телеграмм
 from aiogram import Bot, Dispatcher, executor, types
@@ -10,7 +9,6 @@ from aiogram import Bot, Dispatcher, executor, types
 from Logger import logger
 # конфиги необходимые
 from funcs import config_loader as cfg
-from funcs.jenkins_app import jenkins_checker_thread
 # функции необходимы для работы
 from funcs import main_funcs as mf
 
@@ -99,12 +97,6 @@ async def get_help(message: types.Message) -> None:
 
 # Стартовая функция для запуска бота.
 if __name__ == "__main__":
-    # Создание и запуск отдельного треда чекера дженкинса
-    logger.info('Запуск треда дженкинса на проверку билдов')
-    jenkins_main_thread = threading.Thread(name='jenkins_checker_thread',
-                                           target=jenkins_checker_thread,
-                                           daemon=True)
-    jenkins_main_thread.start()
     logger.info('Начало прослушки и готовности ботом принимать '
                 'команды (long polling)')
     executor.start_polling(DP, skip_updates=True)

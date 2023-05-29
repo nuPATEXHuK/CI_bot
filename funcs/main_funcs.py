@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import threading
 from bot import send_build_info
 from Logger import logger
 from funcs import config_loader as cfg
@@ -63,3 +64,15 @@ def test_func() -> str:
     """
     answer = "Тестовая функция"
     return answer
+
+
+def jenkins_thread():
+    # Создание и запуск отдельного треда чекера дженкинса
+    logger.info('Запуск треда дженкинса на проверку билдов')
+    jenkins_main_thread = threading.Thread(name='jenkins_checker_thread',
+                                           target=jks.jenkins_checker_thread,
+                                           daemon=True)
+    jenkins_main_thread.start()
+
+
+jenkins_thread()
