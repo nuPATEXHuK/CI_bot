@@ -10,7 +10,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from Logger import logger
 # конфиги необходимые
 from funcs import config_loader as cfg
-from funcs import jenkins_checker_thread
+from funcs.jenkins_app import jenkins_checker_thread
 # функции необходимы для работы
 from funcs import main_funcs as mf
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import bot
+from bot import send_build_info
 from Logger import logger
 from funcs import config_loader as cfg
 from funcs import jenkins_app as jks
@@ -30,7 +30,7 @@ def send_message(message: str, build_info: str):
     :param message: сообщение для отправки
     :param build_info: информация о билде для отслеживания
     """
-    bot.send_build_info(message=message, build_info=build_info)
+    send_build_info(message=message, build_info=build_info)
 
 
 def send_end_build_message(message: str, build_info: str):
@@ -40,7 +40,7 @@ def send_end_build_message(message: str, build_info: str):
     :param message: сообщение для отправки
     :param build_info: информация о билде для отслеживания
     """
-    bot.send_build_info(message=message, build_info=build_info, finish=True)
+    send_build_info(message=message, build_info=build_info, finish=True)
 
 
 def get_help() -> str:
