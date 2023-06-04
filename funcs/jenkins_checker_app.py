@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from typing import Optional
 
 import jenkinsapi
 from jenkinsapi.jenkins import Jenkins
@@ -8,55 +7,13 @@ from jenkinsapi.utils.crumb_requester import CrumbRequester
 
 from Logger import logger
 from config_loader import get_jenkins_cfg as cfg
-from main_funcs import send_message, send_end_build_message
+from notification_bot import send_build_info
 
 BASE_URL = cfg()["url"]
 CRUMB = CrumbRequester(baseurl=BASE_URL)
 JENKINS = Jenkins(BASE_URL, requester=CRUMB)
 CHECK_BUILD_LIST = dict()
 TRACKING_JOBS = cfg()['jobs']
-
-
-def new_build() -> Optional[list]:
-    """
-    Функция для запуска нового билда
-    :return: Текст ошибки при неудачном билде
-    """
-    global JENKINS
-    # Проходимся по всем указанным джобам для запуска
-    # Без расширения функции build_add в bot.py будут запускаться все джобы
-    error_list = list()
-    for job in TRACKING_JOBS:
-        # Проверяем последний билд, может выдать исключение, обрабатываем
-        try:
-            last_build = JENKINS.get_job(job).get_last_build()
-            last_num = last_build.get_number()
-        # Предыдущих билдов не было, устанавливаем первый билд
-        except jenkinsapi.custom_exceptions.NoBuildData:
-            last_num = 0
-        # Ошибка соединения, скипаем запуск билда
-        except ConnectionError as error:
-            error_text = ('Ошибка получения последнего билда с дженкинса.\n'
-                          f'Отслеживаемая джоба: {job}'
-                          f'Текст ошибки: {error}')
-            logger.error(error_text)
-            error_list.append(error_text)
-            continue
-        # Попытка запустить джобу с обработкой исключений
-        try:
-            JENKINS.build_job(job)
-            TRACKING_JOBS[job] = last_num + 1
-            logger.info('Запущен новый билд для джобы %s', job)
-        # Если словили любую ошибку, записываем её и скипаем текущую джобу
-        except Exception as error:
-            error_text = ('Ошибка запуска нового билда:\n'
-                          f'Отслеживаемая джоба: {job}'
-                          f'Текст ошибки: {error}')
-            logger.error(error_text)
-            error_list.append(error_text)
-            continue
-    if len(error_list) > 0:
-        return error_list
 
 
 def jenkins_checker_thread():
@@ -95,10 +52,10 @@ def jenkins_checker_thread():
             job_in_telegram = job.replace('_', '\_').replace('/', '\/')
             job_for_tracking = job + '.' + str(last_num)
             # Отправляем информацию о новом билде в телеграмм
-            send_message(f'*Запущен новый билд [{last_num}]({BASE_URL}/job/'
-                         f'{job_in_url}/{last_num})\!*\n\n'
-                         f'Джоба\: {job_in_telegram}\n',
-                         job_for_tracking)
+            send_build_info(f'*Запущен новый билд [{last_num}]({BASE_URL}/job/'
+                            f'{job_in_url}/{last_num})\!*\n\n'
+                            f'Джоба\: {job_in_telegram}\n',
+                            job_for_tracking)
     if len(CHECK_BUILD_LIST) == 0:
         logger.info('Нет билдов для отслеживания')
     else:
@@ -153,14 +110,15 @@ def jenkins_checker_thread():
                         .replace('/', '/job/')
                     job_in_telegram = job.replace('_', '\_').replace('/', '\/')
                     # Отправляем финальное сообщение о завершении билда
-                    send_end_build_message(
+                    send_build_info(
                         f'*Сборка билда {build} завершена\!*\n\n'
                         f'Джоба\: {job_in_telegram}\n'
                         f'Результат\: {result_build}\n'
                         f'Длительность\: {duration}\n'
                         f'[Ссылка на отчёт]({BASE_URL}/job/'
                         f'{job_in_url}/{build}/allure/)',
-                        tracking_job)
+                        tracking_job,
+                        True)
         # Убираем все законченные билды из отслеживаемых
         for untracking_job in untracking_builds:
             element = f'{untracking_job}.{untracking_builds[untracking_job]}'

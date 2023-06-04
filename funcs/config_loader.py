@@ -7,13 +7,23 @@ config = configparser.ConfigParser()
 config.read(Path.cwd() / 'data' / 'config.cfg')
 
 
-def get_token() -> str:
+def get_ntf_token() -> str:
     """
-    Получение токена бота из конфига
+    Получение токена бота запуска билдов из конфига
 
     :return: токен бота
     """
-    token = config.get('main', 'token')
+    token = config.get('main', 'ntf_token')
+    return token
+
+
+def get_exc_token() -> str:
+    """
+    Получение токена бота уведомлений из конфига
+
+    :return: токен бота
+    """
+    token = config.get('main', 'exc_token')
     return token
 
 

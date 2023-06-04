@@ -1,5 +1,6 @@
 [main]
-token = 12345:abcd
+ntf_token = 12345:abcd
+exc_token = 12345:abcd
 info_chat_id = 0
 [jenkins]
 url = http://192.0.0.1:8080
