@@ -24,29 +24,6 @@ BOT = telegram.Bot(token=TOKEN)
 CHAT_ID = cfg.get_chat_id()
 
 
-# Стартовая функция
-def start(update: Update, context: CallbackContext) -> None:
-    """
-    Запускается при первом запуске бота или при команде /start
-
-    :param message: входящая команда /start
-    """
-    update.message.reply_text('Бот запуска билдов')
-
-
-def test(update: Update, context: CallbackContext) -> None:
-    """
-    Тестовая функция для отладки
-
-    :param message: входящая команда /test
-    """
-    answer = mf.test_func()
-    if answer:
-        update.message.reply_text(answer)
-    else:
-        update.message.reply_text('Ничего не вернулось')
-
-
 def build_add(update: Update, context: CallbackContext) -> None:
     """
     Запуск нового билда на сборку (возможно расширение
@@ -58,19 +35,6 @@ def build_add(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(answer)
 
 
-def get_help(update: Update, context: CallbackContext) -> None:
-    """
-    Получение справки по боту
-
-    :param message: входящая команда /help
-    """
-    answer = mf.get_help()
-    if answer:
-        update.message.reply_text(answer)
-    else:
-        update.message.reply_text('Ничего не вернулось')
-
-
 # Стартовая функция для запуска бота.
 def tlg_exc_thread():
     logger.info('Начало прослушки и готовности ботом принимать '
@@ -78,11 +42,5 @@ def tlg_exc_thread():
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(
-        MessageHandler(Filters.command, start))
-    dispatcher.add_handler(
-        MessageHandler(Filters.command, test))
-    dispatcher.add_handler(
-        MessageHandler(Filters.text & ~Filters.command, build_add))
-    dispatcher.add_handler(
-        MessageHandler(Filters.command, get_help))
+        MessageHandler(Filters.command, build_add))
     updater.start_polling(poll_interval=1.0)
