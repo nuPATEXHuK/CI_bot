@@ -57,7 +57,7 @@ def jenkins_checker_thread():
                 # Отправляем информацию о новом билде в телеграмм
                 send_build_info('*Запущен новый билд '
                                 f'{last_num}\!*\n\n'
-                                f'Ссылка на джобу: {BASE_URL}/job/'
+                                f'Ссылка на джобу\: {BASE_URL}/job/'
                                 f'{job_in_url}/{last_num}\n'
                                 f'Джоба\: {job_in_telegram}',
                                 job_for_tracking)
