@@ -16,10 +16,11 @@ def add_build() -> str:
     logger.info('Запущено добавление нового билда')
     errors = jks.new_build()
     # Если не вернулись ошибки:
-    if len(errors) < 1:
+    if errors and len(errors) > 0:
+        return str(errors)
+    else:
         logger.info('Билд запущен')
         return 'Билд запущен'
-    return str(errors)
 
 
 def get_help() -> str:
