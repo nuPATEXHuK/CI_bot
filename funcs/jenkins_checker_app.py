@@ -7,8 +7,8 @@ from jenkinsapi.jenkins import Jenkins
 from jenkinsapi.utils.crumb_requester import CrumbRequester
 
 from Logger import logger
-from config_loader import get_jenkins_cfg as cfg
-from notification_bot import send_build_info
+from .config_loader import get_jenkins_cfg as cfg
+from .notification_bot import send_build_info
 
 BASE_URL = cfg()["url"]
 CRUMB = CrumbRequester(baseurl=BASE_URL)
