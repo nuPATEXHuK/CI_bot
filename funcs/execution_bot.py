@@ -18,7 +18,7 @@ from funcs import main_funcs as mf
 logging.basicConfig(level=logging.INFO)
 
 # Для работы бота в телеграмм
-TOKEN = cfg.get_ntf_token()
+TOKEN = cfg.get_exc_token()
 BOT = telegram.Bot(token=TOKEN)
 # то куда мы будем выводить, информация о билде
 CHAT_ID = cfg.get_chat_id()
