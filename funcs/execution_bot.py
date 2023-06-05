@@ -2,8 +2,9 @@
 # pylint: disable=import-error
 import logging
 
-# методы IOgram для телеграмм
-from aiogram import Bot, Dispatcher, executor, types
+import telegram
+from telegram import Update
+from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
 
 # Кастомные логи для телеграмм
 from Logger import logger
@@ -17,27 +18,23 @@ from funcs import main_funcs as mf
 logging.basicConfig(level=logging.INFO)
 
 # Для работы бота в телеграмм
-TOKEN = cfg.get_exc_token()
-BOT = Bot(TOKEN)
-DP = Dispatcher(BOT)
+TOKEN = cfg.get_ntf_token()
+BOT = telegram.Bot(token=TOKEN)
 # то куда мы будем выводить, информация о билде
 CHAT_ID = cfg.get_chat_id()
-TRACKING_BUILDS = {}
 
 
 # Стартовая функция
-@DP.message_handler(commands=['start'])
-async def start(message: types.Message) -> None:
+def start(update: Update, context: CallbackContext) -> None:
     """
     Запускается при первом запуске бота или при команде /start
 
     :param message: входящая команда /start
     """
-    await message.answer('Бот запуска билдов')
+    update.message.reply_text('Бот запуска билдов')
 
 
-@DP.message_handler(commands=['test'])
-async def test(message: types.Message) -> None:
+def test(update: Update, context: CallbackContext) -> None:
     """
     Тестовая функция для отладки
 
@@ -45,13 +42,12 @@ async def test(message: types.Message) -> None:
     """
     answer = mf.test_func()
     if answer:
-        await message.answer(answer)
+        update.message.reply_text(answer)
     else:
-        await message.answer('Ничего не вернулось')
+        update.message.reply_text('Ничего не вернулось')
 
 
-@DP.message_handler(commands=['build'])
-async def build_add(message: types.Message) -> None:
+def build_add(update: Update, context: CallbackContext) -> None:
     """
     Запуск нового билда на сборку (возможно расширение
     функции для указания конкретного билда)
@@ -59,11 +55,10 @@ async def build_add(message: types.Message) -> None:
     :param message: входящая команда /build
     """
     answer = mf.add_build()
-    await message.answer(answer)
+    update.message.reply_text(answer)
 
 
-@DP.message_handler(commands=['help'])
-async def get_help(message: types.Message) -> None:
+def get_help(update: Update, context: CallbackContext) -> None:
     """
     Получение справки по боту
 
@@ -71,13 +66,23 @@ async def get_help(message: types.Message) -> None:
     """
     answer = mf.get_help()
     if answer:
-        await message.answer(answer)
+        update.message.reply_text(answer)
     else:
-        await message.answer('Ничего не вернулось')
+        update.message.reply_text('Ничего не вернулось')
 
 
 # Стартовая функция для запуска бота.
 def tlg_exc_thread():
     logger.info('Начало прослушки и готовности ботом принимать '
                 'команды (long polling)')
-    executor.start_polling(DP, skip_updates=True)
+    updater = Updater(TOKEN)
+    dispatcher = updater.dispatcher
+    dispatcher.add_handler(
+        MessageHandler(Filters.command, start))
+    dispatcher.add_handler(
+        MessageHandler(Filters.command, test))
+    dispatcher.add_handler(
+        MessageHandler(Filters.text & ~Filters.command, build_add))
+    dispatcher.add_handler(
+        MessageHandler(Filters.command, get_help))
+    updater.start_polling(poll_interval=1.0)
