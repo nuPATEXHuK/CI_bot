@@ -53,11 +53,13 @@ def jenkins_checker_thread():
                 # Готовим данные для отправки в телеграмм
                 job_in_url = job.replace('/', '/job/')
                 job_in_telegram = job.replace('_', '\_').replace('/', '\/')
+                url_in_telegram = BASE_URL.replace(
+                    '_', '\_').replace('/', '\/').replace(':', '\:')
                 job_for_tracking = job + '.' + str(last_num)
                 # Отправляем информацию о новом билде в телеграмм
                 send_build_info('*Запущен новый билд '
                                 f'{last_num}\!*\n\n'
-                                f'Ссылка на джобу\: {BASE_URL}/job/'
+                                f'Ссылка на джобу\: {url_in_telegram}\/job\/'
                                 f'{job_in_url}/{last_num}\n'
                                 f'Джоба\: {job_in_telegram}',
                                 job_for_tracking)
