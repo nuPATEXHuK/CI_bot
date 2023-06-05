@@ -56,9 +56,10 @@ def jenkins_checker_thread():
                 job_for_tracking = job + '.' + str(last_num)
                 # Отправляем информацию о новом билде в телеграмм
                 send_build_info('*Запущен новый билд '
-                                f'[{last_num}]({BASE_URL}/job/'
-                                f'{job_in_url}/{last_num})\!*\n\n'
-                                f'Джоба\: {job_in_telegram}\n',
+                                f'{last_num}\!*\n\n'
+                                f'Ссылка на джобу: {BASE_URL}/job/'
+                                f'{job_in_url}/{last_num}\n'
+                                f'Джоба\: {job_in_telegram}',
                                 job_for_tracking)
         if len(CHECK_BUILD_LIST) == 0:
             logger.info('Нет билдов для отслеживания')
@@ -120,9 +121,7 @@ def jenkins_checker_thread():
                             f'*Сборка билда {build} завершена\!*\n\n'
                             f'Джоба\: {job_in_telegram}\n'
                             f'Результат\: {result_build}\n'
-                            f'Длительность\: {duration}\n'
-                            f'[Ссылка на отчёт]({BASE_URL}/job/'
-                            f'{job_in_url}/{build}/allure/)',
+                            f'Длительность\: {duration}\n',
                             tracking_job,
                             True)
             # Убираем все законченные билды из отслеживаемых
